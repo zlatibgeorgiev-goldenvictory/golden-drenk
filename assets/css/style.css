@@ -1271,3 +1271,55 @@ button:active {
   width: auto;
   flex-shrink: 0;
 }
+
+
+/* 14. STANDALONE SUBPAGES (ritual.html & science.html) */
+.page-hero {
+  padding: 64px 0 44px 0;
+  text-align: center;
+  background: linear-gradient(180deg, #161D24 0%, #0E1318 100%);
+  border-bottom: 1px solid var(--border-solid);
+}
+
+.deep-dive-section {
+  padding: 56px 0 88px 0;
+}
+
+.deep-dive-content {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.content-box {
+  background: var(--secondary-dark);
+  border: 1px solid var(--border-solid);
+  border-radius: var(--radius-lg);
+  padding: 36px 28px;
+  margin-bottom: 28px;
+  transition: var(--transition-smooth);
+}
+
+.content-box:hover {
+  border-color: var(--border-subtle);
+}
+
+.content-box h3 {
+  font-size: 26px;
+  margin-bottom: 14px;
+  color: var(--accent-gold-light);
+}
+
+.content-box p {
+  margin-bottom: 14px;
+  font-size: 16px;
+  color: var(--text-body);
+}
+
+.synergy-highlight {
+  background: rgba(212, 175, 55, 0.08);
+  border-left: 3px solid var(--accent-gold);
+  padding: 18px 22px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-top: 16px;
+  font-size: 15px;
+}
