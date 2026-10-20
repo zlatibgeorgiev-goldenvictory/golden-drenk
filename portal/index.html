@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <title>COMMAND PORTAL (V2.0) | GOLDEN DRENK Read-Only Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    body { padding-bottom: 40px; }
+    .portal-shell { padding: 36px 0 80px 0; }
+    .portal-top-bar {
+      background: var(--secondary-dark);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    .portal-version-tag {
+      display: inline-block;
+      color: var(--accent-gold-light);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .portal-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .portal-tab-btn {
+      padding: 10px 20px;
+      background: var(--secondary-dark);
+      border: 1px solid var(--border-solid);
+      color: var(--text-muted);
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .portal-tab-btn.active {
+      background: var(--gold-gradient);
+      color: #0E1318;
+      border-color: transparent;
+    }
+    .portal-panel { display: none; }
+    .portal-panel.active { display: block; }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .portal-box {
+      background: var(--secondary-dark);
+      border: 1px solid var(--border-solid);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .status-pill {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .status-done { background: rgba(72, 187, 120, 0.16); color: #48BB78; }
+    .status-progress { background: rgba(245, 166, 35, 0.16); color: #F5A623; }
+    .status-planned { background: rgba(154, 166, 178, 0.16); color: #9AA6B2; }
+    .task-row {
+      padding: 14px 16px;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid var(--border-solid);
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .lock-screen {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PIN Lock Gate (Protects direct URL visits on PC & Mobile) -->
+  <div class="lock-screen" id="portalLockScreen">
+    <div class="modal-card pin-modal-card">
+      <span class="portal-version-tag">ЗАЩИТЕН ДОСТЪП</span>
+      <h1 style="font-size: 26px; margin-bottom: 12px;">GOLDEN DRENK Portal</h1>
+      <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Въведи ПИН код за преглед:</p>
+      <form id="directPinForm">
+        <input type="password" inputmode="numeric" maxlength="4" class="form-input pin-input" id="directPinInput" placeholder="••••" required>
+        <div class="form-error-msg" id="directPinError" style="display: none;">Невалиден ПИН код.</div>
+        <button type="submit" class="cta-btn-gold btn-primary-full" style="margin-top: 14px;">Отключи</button>
+      </form>
+      <div style="margin-top: 16px;">
+        <a href="../index.html" style="font-size: 13px; color: var(--text-muted);">&larr; Обратно към магазина</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Content (Hidden until PIN 2738 is verified) -->
+  <div class="container portal-shell" id="portalDashboardContent" style="display: none;">
+    
+    <div class="portal-top-bar">
+      <div>
+        <span class="portal-version-tag">COMMAND PORTAL • V2.0 (CLEAN ARCHITECTURE)</span>
+        <h1 style="font-size: 32px;">GOLDEN DRENK Project Dashboard</h1>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+          Read-Only визуален контролен панел (Управляван от Gemini AI чрез чата)
+        </p>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <a href="../index.html" class="cta-btn-gold">🛍️ Към Магазина</a>
+        <button type="button" class="btn-secondary" id="lockPortalBtn" style="width: auto; padding: 12px 18px;">🔒 Заключи</button>
+      </div>
+    </div>
+
+    <div class="portal-tabs">
+      <button type="button" class="portal-tab-btn active" data-tab="tab-overview">📊 Прогрес &amp; Версии</button>
+      <button type="button" class="portal-tab-btn" data-tab="tab-tasks">📋 Задачи (Managed by Gemini)</button>
+      <button type="button" class="portal-tab-btn" data-tab="tab-specs">📐 Продукт &amp; BigArena SKU</button>
+      <button type="button" class="portal-tab-btn" data-tab="tab-orders">📦 Тестови Поръчки</button>
+    </div>
+
+    <!-- TAB 1: Overview & Changelog -->
+    <div class="portal-panel active" id="tab-overview">
+      <div class="kpi-grid">
+        <div class="portal-box">
+          <span class="portal-version-tag">1. Архитектура &amp; Скорост</span>
+          <h3 style="font-size: 30px; margin: 6px 0;">100% Чист Код</h3>
+          <p style="font-size: 13px; color: var(--text-muted);">Премахнати Base64 картинки. Локални WOFF2 шрифтове и външни WebP файлове.</p>
+        </div>
+        <div class="portal-box">
+          <span class="portal-version-tag">2. Продукт &amp; Доставка</span>
+          <h3 style="font-size: 30px; margin: 6px 0;">30 € / 54 €</h3>
+          <p style="font-size: 13px; color: var(--text-muted);">30 сашета х 3.69g. 100% Безплатна доставка в България и за двата пакета.</p>
+        </div>
+        <div class="portal-box">
+          <span class="portal-version-tag">3. SEO &amp; AI Агенти</span>
+          <h3 style="font-size: 30px; margin: 6px 0;">JSON-LD + LLMs</h3>
+          <p style="font-size: 13px; color: var(--text-muted);">Вградени Product, Offer и FAQPage схеми + llms.txt за AI търсачки.</p>
+        </div>
+        <div class="portal-box">
+          <span class="portal-version-tag">4. Фулфилмент</span>
+          <h3 style="font-size: 30px; margin: 6px 0;">BigArena Ready</h3>
+          <p style="font-size: 13px; color: var(--text-muted);">1-Click чекаут за Спиди/Еконт с готов JSON пакет за BigArena API.</p>
+        </div>
+      </div>
+
+      <div class="portal-box">
+        <h3 style="font-size: 22px; margin-bottom: 14px;">История на версиите (Changelog)</h3>
+        <div class="task-row">
+          <div>
+            <strong>V2.0.0 (Текуща версия)</strong> — Пълно пренаписване от нулата: отделни файлове, локални шрифтове, WebP изображения, JSON-LD, БАБХ футър, ПИН защита (2738).
+          </div>
+          <span class="status-pill status-done">АКТИВНА</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Tasks -->
+    <div class="portal-panel" id="tab-tasks">
+      <div class="portal-box">
+        <h3 style="font-size: 22px; margin-bottom: 14px;">План за изпълнение (Обновява се чрез Gemini в чата)</h3>
+        <div class="task-row">
+          <span>✅ <strong>Фаза 1:</strong> Създаване на чист <code>index.html</code> и <code>assets/css/style.css</code> с Mobile-First UX</span>
+          <span class="status-pill status-done">ГОТОВО</span>
+        </div>
+        <div class="task-row">
+          <span>✅ <strong>Фаза 2:</strong> Изграждане на <code>assets/js/app.js</code>, скрит Read-Only Портал (ПИН 2738), <code>llms.txt</code> и <code>robots.txt</code></span>
+          <span class="status-pill status-done">ГОТОВО</span>
+        </div>
+        <div class="task-row">
+          <span>⏳ <strong>Фаза 3:</strong> Изграждане на отделните SEO страници <code>ritual.html</code> и <code>science.html</code> + качване на локалните WOFF2 шрифтове</span>
+          <span class="status-pill status-progress">СЛЕДВАЩА СТЪПКА</span>
+        </div>
+        <div class="task-row">
+          <span>💡 <strong>Фаза 4:</strong> Попълване на фирмени данни в Общите условия и добавяне на реален BigArena API Webhook ключ</span>
+          <span class="status-pill status-planned">ОЧАКВА ДАННИ</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Product & BigArena Specs -->
+    <div class="portal-panel" id="tab-specs">
+      <div class="portal-box">
+        <h3 style="font-size: 22px; margin-bottom: 14px;">Параметри на продукта и фулфилмент (BigArena)</h3>
+        <div class="kpi-grid">
+          <div class="task-row"><span>Доза на 1 саше:</span><strong>3.69 g</strong></div>
+          <div class="task-row"><span>Кутия (30 сашета):</span><strong>110.7 g нетно</strong></div>
+          <div class="task-row"><span>SKU Стартов Пакет:</span><strong>GD-BOX-30 (30.00 €)</strong></div>
+          <div class="task-row"><span>SKU Двоен Пакет:</span><strong>GD-BUNDLE-60 (54.00 €)</strong></div>
+        </div>
+        <p style="font-size: 14px; color: var(--text-muted);">
+          <strong>Състав:</strong> Органична куркума (95% куркумин), Черен пипер (Пиперин +2000% бионаличност), Джинджифил, Цейлонска канела.
+        </p>
+      </div>
+    </div>
+
+    <!-- TAB 4: Local Orders Log -->
+    <div class="portal-panel" id="tab-orders">
+      <div class="portal-box">
+        <h3 style="font-size: 22px; margin-bottom: 14px;">Тестови поръчки от това устройство (BigArena JSON преглед)</h3>
+        <div id="portalOrdersList"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    (() => {
+      const PIN = '2738';
+      const KEY = 'gd_v2_dev_unlocked';
+      const lockScreen = document.getElementById('portalLockScreen');
+      const dashboard = document.getElementById('portalDashboardContent');
+      const form = document.getElementById('directPinForm');
+      const input = document.getElementById('directPinInput');
+      const err = document.getElementById('directPinError');
+
+      function showDashboard() {
+        lockScreen.style.display = 'none';
+        dashboard.style.display = 'block';
+        renderOrders();
+      }
+
+      if (sessionStorage.getItem(KEY) === 'true') {
+        showDashboard();
+      }
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (input.value.trim() === PIN) {
+          sessionStorage.setItem(KEY, 'true');
+          showDashboard();
+        } else {
+          err.style.display = 'block';
+          input.value = '';
+        }
+      });
+
+      document.getElementById('lockPortalBtn').addEventListener('click', () => {
+        sessionStorage.removeItem(KEY);
+        window.location.href = '../index.html';
+      });
+
+      document.querySelectorAll('.portal-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.portal-tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.portal-panel').forEach(p => p.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(btn.getAttribute('data-tab'))?.classList.add('active');
+        });
+      });
+
+      function renderOrders() {
+        const box = document.getElementById('portalOrdersList');
+        const orders = JSON.parse(localStorage.getItem('gd_v2_orders') || '[]');
+        if (orders.length === 0) {
+          box.innerHTML = '<p style="color:var(--text-muted); font-size:14px;">Няма записани тестови поръчки.</p>';
+          return;
+        }
+        box.innerHTML = orders.map(o => `
+          <div class="task-row" style="flex-direction:column; align-items:flex-start;">
+            <div style="display:flex; justify-content:space-between; width:100%;">
+              <strong style="color:var(--accent-gold-light);">${o.order_id} — ${o.customer.full_name} (${o.customer.phone})</strong>
+              <span class="status-pill status-done">${o.cod_amount_eur.toFixed(2)} € COD</span>
+            </div>
+            <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+              Куриер: ${o.customer.courier} (${o.customer.delivery_type}) • ${o.customer.city}, ${o.customer.destination}
+            </div>
+          </div>
+        `).join('');
+      }
+    })();
+  </script>
+</body>
+</html>
