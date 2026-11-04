@@ -808,11 +808,9 @@ const SUPABASE_URL = 'https://ljnztikzquiblflmwsoq.supabase.co';
     }
 
     const { error } = await supabaseClient.from('mailing_list').insert([{ email }]);
-    if (error && error.code === '23505') {
-      msg.textContent = 'Този имейл вече е записан в Златния списък!';
-    } else if (error) {
+    if (error) {
       msg.style.color = '#ff6b6b';
-      msg.textContent = 'Грешка при запис. Опитайте отново.';
+      msg.textContent = 'Грешка: ' + error.message; // Показва точната грешка от сървъра
     } else {
       msg.style.color = '#4cd137';
       msg.textContent = 'Успешно записване! Ти си златен.';
