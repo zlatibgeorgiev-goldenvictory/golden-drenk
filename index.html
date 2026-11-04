@@ -167,7 +167,8 @@
         <a href="ritual.html" class="nav-link">Ритуалът</a>
         <a href="science.html" class="nav-link">Съставки</a>
         <a href="#bundles-section" class="nav-link">Пакети</a>
-      </nav>
+      <a href="javascript:void(0)" onclick="openAuthModal()" class="nav-link" id="userNavBtn" style="color: #d4af37; font-weight: 700;">Вход</a>
+    </nav>
 
       <div class="header-actions">
         <!-- Secret Dev Portal Button (Hidden by default, unlocked via ?dev=true or PIN 2738) -->
@@ -663,5 +664,246 @@
 
   <!-- Main Application Script -->
   <script src="assets/js/app.js" defer></script>
+<!-- ================= POPUP: ТИ СИ ЗЛАТЕН (ПРЕОРДЪР + МЕЙЛИНГ ЛИСТ) ================= -->
+<div id="goldenPopupOverlay" class="gd-modal-overlay">
+  <div class="gd-modal-box">
+    <button class="gd-close-btn" onclick="closeGoldenPopup()">&times;</button>
+    
+    <div class="gd-logo-mini">GOLDEN<br>DRENK</div>
+    <h2 class="gd-title">ТИ СИ ЗЛАТЕН</h2>
+    <p class="gd-subtitle">YOU ARE GOLDEN</p>
+    <div class="gd-preorder-badge">ПЪРВА ПАРТИДА • ПРЕДВАРИТЕЛНА ПОРЪЧКА</div>
+
+    <div id="popupStep1">
+      <button class="gd-gold-btn" onclick="revealPreorderPackages()">
+        Открий Ритуала
+      </button>
+    </div>
+
+    <div id="popupStep2" class="gd-packages-grid" style="display: none;">
+      <div class="gd-pkg-card">
+        <span class="gd-pkg-badge">Стартов Пакет</span>
+        <h4>1 Кутия (30 сашета)</h4>
+        <div class="gd-pkg-price">30.00 €</div>
+        <p class="gd-pkg-note">Предварителна поръчка</p>
+        <button class="gd-pkg-btn" onclick="selectPreorder('GD-BOX-30', 'Стартов Пакет (1 кутия / 30 сашета)', 30.00)">
+          Поръчай 1 Пакет
+        </button>
+      </div>
+
+      <div class="gd-pkg-card featured">
+        <span class="gd-pkg-badge gold">Най-изгодно</span>
+        <h4>2 Кутии (60 сашета)</h4>
+        <div class="gd-pkg-price">54.00 €</div>
+        <p class="gd-pkg-note">+ Безплатна доставка & Подарък</p>
+        <button class="gd-gold-btn small" onclick="selectPreorder('GD-BUNDLE-60', 'Двоен Пакет (2 кутии / 60 сашета)', 54.00)">
+          Поръчай 2 Пакета
+        </button>
+      </div>
+    </div>
+
+    <div class="gd-mailing-box">
+      <p>Влез в Златния списък за ранен достъп и известия:</p>
+      <form id="gdMailingForm" onsubmit="saveEmailToList(event)">
+        <input type="email" id="gdSubscriberEmail" placeholder="Твоят имейл адрес..." required>
+        <button type="submit" id="gdSubBtn">Запиши ме</button>
+      </form>
+      <p id="gdMailingMsg" class="gd-msg"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ================= МОДАЛ ЗА ВХОД / РЕГИСТРАЦИЯ ================= -->
+<div id="authModalOverlay" class="gd-modal-overlay" style="display: none;">
+  <div class="gd-modal-box auth-box">
+    <button class="gd-close-btn" onclick="closeAuthModal()">&times;</button>
+    <h3 class="gd-auth-title" id="authHeaderTitle">Вход в Златния Клуб</h3>
+    
+    <button type="button" class="gd-google-btn" onclick="loginWithGoogle()">
+      <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="18">
+      Продължи с Google
+    </button>
+
+    <div class="gd-divider"><span>или с имейл</span></div>
+
+    <form id="gdAuthForm" onsubmit="handleEmailAuth(event)">
+      <input type="email" id="authEmail" placeholder="Имейл адрес" required>
+      <input type="password" id="authPassword" placeholder="Парола (мин. 6 символа)" minlength="6" required>
+      <button type="submit" class="gd-gold-btn" id="authSubmitBtn">Влез в профила</button>
+    </form>
+
+    <p id="authStatusMsg" class="gd-msg"></p>
+
+    <p class="gd-auth-switch">
+      <span id="authSwitchText">Нямаш профил?</span>
+      <a href="javascript:void(0)" onclick="toggleAuthMode()" id="authSwitchLink">Регистрирай се</a>
+    </p>
+
+    <div id="loggedInPanel" style="display: none; margin-top: 15px;">
+      <p id="loggedUserEmail" style="color: #d4af37; font-size: 14px;"></p>
+      <button onclick="logoutUser()" class="gd-pkg-btn" style="margin-top: 10px;">Изход от профила</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://ljnztikzquiblflmwsoq.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_9V5JAYcvnQ1bnq5IEcqwxQ_sJR__Slu';
+  const supabaseClient = (SUPABASE_URL.startsWith('http')) 
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
+    : null;
+
+  let isRegisterMode = false;
+
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!sessionStorage.getItem('gdPopupSeen')) {
+      setTimeout(() => {
+        document.getElementById('goldenPopupOverlay').style.display = 'flex';
+      }, 1200);
+    }
+    checkCurrentUser();
+  });
+
+  function closeGoldenPopup() {
+    document.getElementById('goldenPopupOverlay').style.display = 'none';
+    sessionStorage.setItem('gdPopupSeen', 'true');
+  }
+
+  function revealPreorderPackages() {
+    document.getElementById('popupStep1').style.display = 'none';
+    document.getElementById('popupStep2').style.display = 'grid';
+  }
+
+  async function selectPreorder(sku, name, price) {
+    if (supabaseClient) {
+      await supabaseClient.from('preorders').insert([{ sku, package_name: name, price }]);
+    }
+    closeGoldenPopup();
+    const targetBtn = document.querySelector(`[data-sku="${sku}"]`) || document.getElementById('bundles-section');
+    if (targetBtn && targetBtn.click && targetBtn.hasAttribute('data-sku')) {
+      targetBtn.click();
+    } else if (targetBtn) {
+      targetBtn.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  async function saveEmailToList(e) {
+    e.preventDefault();
+    const emailInput = document.getElementById('gdSubscriberEmail');
+    const msg = document.getElementById('gdMailingMsg');
+    const email = emailInput.value.trim();
+
+    msg.style.color = '#d4af37';
+    msg.textContent = 'Записване...';
+
+    const localList = JSON.parse(localStorage.getItem('gd_mailing_backup') || '[]');
+    localList.push({ email, date: new Date().toISOString() });
+    localStorage.setItem('gd_mailing_backup', JSON.stringify(localList));
+
+    if (!supabaseClient) {
+      msg.style.color = '#4cd137';
+      msg.textContent = 'Успешно записване! Ти си златен.';
+      emailInput.value = '';
+      return;
+    }
+
+    const { error } = await supabaseClient.from('mailing_list').insert([{ email }]);
+    if (error && error.code === '23505') {
+      msg.textContent = 'Този имейл вече е записан в Златния списък!';
+    } else if (error) {
+      msg.style.color = '#ff6b6b';
+      msg.textContent = 'Грешка при запис. Опитайте отново.';
+    } else {
+      msg.style.color = '#4cd137';
+      msg.textContent = 'Успешно записване! Ти си златен.';
+      emailInput.value = '';
+    }
+  }
+
+  function openAuthModal() {
+    document.getElementById('authModalOverlay').style.display = 'flex';
+  }
+  function closeAuthModal() {
+    document.getElementById('authModalOverlay').style.display = 'none';
+  }
+
+  function toggleAuthMode() {
+    isRegisterMode = !isRegisterMode;
+    document.getElementById('authHeaderTitle').textContent = isRegisterMode ? 'Регистрация в Клуба' : 'Вход в Златния Клуб';
+    document.getElementById('authSubmitBtn').textContent = isRegisterMode ? 'Създай профил' : 'Влез в профила';
+    document.getElementById('authSwitchText').textContent = isRegisterMode ? 'Вече имаш профил?' : 'Нямаш профил?';
+    document.getElementById('authSwitchLink').textContent = isRegisterMode ? 'Влез тук' : 'Регистрирай се';
+    document.getElementById('authStatusMsg').textContent = '';
+  }
+
+  async function handleEmailAuth(e) {
+    e.preventDefault();
+    const msg = document.getElementById('authStatusMsg');
+    if (!supabaseClient) {
+      msg.textContent = 'Базата данни предстои да бъде свързана.';
+      return;
+    }
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    msg.style.color = '#d4af37';
+    msg.textContent = 'Обработка...';
+
+    if (isRegisterMode) {
+      const { error } = await supabaseClient.auth.signUp({ email, password });
+      msg.style.color = error ? '#ff6b6b' : '#4cd137';
+      msg.textContent = error ? error.message : 'Профилът е създаден! Провери имейла си.';
+    } else {
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        msg.style.color = '#ff6b6b';
+        msg.textContent = 'Невалиден имейл или парола.';
+      } else {
+        msg.style.color = '#4cd137';
+        msg.textContent = 'Успешен вход!';
+        checkCurrentUser();
+        setTimeout(closeAuthModal, 800);
+      }
+    }
+  }
+
+  async function loginWithGoogle() {
+    if (!supabaseClient) {
+      alert('Свържете Supabase ключовете, за да работи входът с Google.');
+      return;
+    }
+    await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin }
+    });
+  }
+
+  async function checkCurrentUser() {
+    if (!supabaseClient) return;
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const navBtn = document.getElementById('userNavBtn');
+    const loggedPanel = document.getElementById('loggedInPanel');
+    const authForm = document.getElementById('gdAuthForm');
+
+    if (user) {
+      if (navBtn) navBtn.textContent = 'Профил ✓';
+      if (loggedPanel) {
+        loggedPanel.style.display = 'block';
+        document.getElementById('loggedUserEmail').textContent = `Логнат като: ${user.email}`;
+      }
+      if (authForm) authForm.style.display = 'none';
+    } else {
+      if (navBtn) navBtn.textContent = 'Вход';
+      if (loggedPanel) loggedPanel.style.display = 'none';
+      if (authForm) authForm.style.display = 'flex';
+    }
+  }
+
+  async function logoutUser() {
+    if (!supabaseClient) return;
+    await supabaseClient.auth.signOut();
+    checkCurrentUser();
+  }
+</script>
 </body>
 </html>
