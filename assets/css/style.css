@@ -1323,3 +1323,216 @@ button:active {
   margin-top: 16px;
   font-size: 15px;
 }
+/* === GOLDEN POPUP & AUTH MODAL STYLES === */
+.gd-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 17, 0.82);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.gd-modal-box {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  background: radial-gradient(circle at 75% 30%, rgba(212, 175, 55, 0.16), transparent 55%), #0c1222;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 18px;
+  padding: 42px 32px 30px;
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(212, 175, 55, 0.15);
+  animation: gdFadeIn 0.35s ease-out;
+}
+
+.gd-modal-box.auth-box {
+  max-width: 420px;
+}
+
+@keyframes gdFadeIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.gd-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 28px;
+  cursor: pointer;
+  line-height: 1;
+}
+.gd-close-btn:hover { color: #d4af37; }
+
+.gd-logo-mini {
+  color: #d4af37;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 16px;
+  line-height: 1.15;
+  margin-bottom: 20px;
+}
+
+.gd-title {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 800;
+  background: linear-gradient(90deg, #b8860b, #f3e5ab, #d4af37);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 6px;
+  letter-spacing: 1.5px;
+}
+
+.gd-subtitle {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 18px;
+  letter-spacing: 4px;
+  margin: 0 0 14px;
+}
+
+.gd-preorder-badge {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #d4af37;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  padding: 5px 14px;
+  border-radius: 99px;
+  margin-bottom: 26px;
+}
+
+.gd-gold-btn {
+  background: linear-gradient(135deg, #c59b27 0%, #f5d77f 50%, #b38728 100%);
+  color: #0c1222;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 36px;
+  border-radius: 99px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.gd-gold-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 35px rgba(212, 175, 55, 0.65);
+}
+.gd-gold-btn.small {
+  padding: 11px 22px;
+  font-size: 14px;
+  width: 100%;
+}
+
+/* Двете карти за преордър */
+.gd-packages-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+  animation: gdFadeIn 0.3s ease-out;
+}
+
+.gd-pkg-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 20px 16px;
+  position: relative;
+}
+.gd-pkg-card.featured {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.gd-pkg-badge {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #aaa;
+}
+.gd-pkg-badge.gold { color: #f5d77f; font-weight: 700; }
+
+.gd-pkg-card h4 { margin: 8px 0; font-size: 18px; }
+.gd-pkg-price { font-size: 24px; font-weight: 800; color: #f5d77f; margin-bottom: 6px; }
+.gd-pkg-note { font-size: 12px; color: rgba(255,255,255,0.65); margin-bottom: 14px; }
+
+.gd-pkg-btn {
+  width: 100%;
+  padding: 11px 18px;
+  border-radius: 99px;
+  border: 1px solid #d4af37;
+  background: transparent;
+  color: #f5d77f;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gd-pkg-btn:hover { background: rgba(212, 175, 55, 0.15); }
+
+/* Мейлинг лист */
+.gd-mailing-box {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.gd-mailing-box p { font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 10px; }
+#gdMailingForm {
+  display: flex;
+  gap: 8px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+#gdMailingForm input, #gdAuthForm input {
+  flex: 1;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  font-size: 14px;
+}
+#gdSubBtn {
+  padding: 11px 20px;
+  border-radius: 10px;
+  border: 1px solid #d4af37;
+  background: rgba(212, 175, 55, 0.2);
+  color: #f5d77f;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Логин система */
+#gdAuthForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.gd-google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: #ffffff;
+  color: #111;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 14px;
+}
+.gd-divider {
+  margin: 16px 0;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+}
+.gd-auth-switch { font-size: 13px; margin-top: 14px; }
+.gd-auth-switch a { color: #f5d77f; text-decoration: underline; }
+.gd-msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
